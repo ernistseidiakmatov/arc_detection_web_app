@@ -17,9 +17,9 @@ class SignalPredictor:
     def load_model(self):
         
         if self.model_type == "lstm":
-            model_dir = "models/tflite_LSTM_v0.3.tflite"
+            model_dir = "models/LSTM_v_1.9.0.tflite"
         else:
-            model_dir = "models/tflite_MLP_v0.3.tflite"
+            model_dir = "models/MLP_v_1.9.0.tflite"
         interpreter = tf.lite.Interpreter(model_path=model_dir)
         interpreter.allocate_tensors()
         self.interpreter = interpreter
@@ -81,7 +81,7 @@ def calc_features(signal):
     return [mean, std, var, skewness, kurtosis, peak_to_peak, rms, dominant_freq, spectral_entropy]
     
 
-def get_dataset(arc="datasets/dummy_data/arc.csv",  non_arc="datasets/dummy_data/non-arc.csv", sep=' '):
+def get_dataset(arc="datasets/dummy_data/good_test_arc.csv",  non_arc="datasets/dummy_data/good_test_non-arc.csv", sep=','):
     arc = pd.read_csv(arc, sep=sep, header=None)
     non_arc = pd.read_csv(non_arc, sep=sep, header=None)
 
@@ -94,4 +94,4 @@ def get_single_signal_feature(signal):
     return np.array(features)
 
 def get_scaler():
-    return joblib.load("models/std_scaler.bin")
+    return joblib.load("models/std_scaler_v1.9.bin")

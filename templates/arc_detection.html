@@ -11,20 +11,29 @@
     <div class="container">
         <h1>Arc Detector</h1>
         <div class="arc-section">
-            <form id="arcDetectionForm">
-                <label for="signal_length"><strong>Signal Length:</strong></label>
-                <input type="number" name="signal_length" value="2048" id="signal_length" required><br><br>
+            <div class="form-div">
+                <form id="arcDetectionForm">
+                    <label for="signal_length"><strong>Signal Length:</strong></label>
+                    <!-- <input type="number" name="signal_length" value="2048" id="signal_length" required><br><br> -->
+                    <select name="signal_length" id="signal_length" required>
+                        <option value="2048">2048</option>
+                        <option value="1024">1024</option>
+                        <option value="512">512</option>
+                    </select><br><br>
 
-                <label for="save_arc_data"><strong>Save Arc Data:</strong></label>
-                <select name="save_arc_data" name="save_arc_data" id="save_arc_data" required>
-                    <option value="True">True</option>
-                    <option value="False">False</option>
-                </select><br><br>
-
-                <label for="save_dir"><strong>Save Dir </strong></label>
-                <input type="text" name="save_dir" id="save_dir" value="/dataset/" required><br><br>
-                <button type="button" onclick="startDetection()" id="startStopBtn"><strong>Start</strong></button>
-            </form>
+                    <label for="save_arc_data"><strong>Save Arc Data:</strong></label>
+                    <select name="save_arc_data" id="save_arc_data" required>
+                        <option value="True">True</option>
+                        <option value="False">False</option>
+                    </select><br><br>
+    
+                    <label for="save_dir"><strong>Save Dir </strong></label>
+                    <input type="text" name="save_dir" id="save_dir" value="/dataset/" required><br><br>
+                    <button type="button" onclick="startDetection()" id="startBtn"><strong>Start</strong></button>
+                    <button type="button" onclick="updateParameters()" id="updateBtn"><strong>Update</strong></button>
+                    <button type="button" onclick="stopDetection()" id="stopBtn"><strong>Stop</strong></button>
+                </form>
+            </div>
             <!-- <div class="arc-parameters">
                 <p><strong>Signal Length:</strong> 2048</p>
                 <p><strong>Save Arc data:</strong> False</p>

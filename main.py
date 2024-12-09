@@ -146,7 +146,7 @@ async def websocket_endpoint(websocket: WebSocket):
         if predicted_class == 0:
             count_ += 1
 
-        trace_signal = go.Scatter(x=t, y=signals[i][:512], mode='lines', name='Signal', line=dict(color=color))
+        trace_signal = go.Scatter(x=t, y=signals[i][:], mode='lines', name='Signal', line=dict(color=color))
         layout = go.Layout(title=f"Real-time Signal Plot {i+1}", xaxis_title="Time", yaxis_title="Amplitude")
         fig = go.Figure(data=[trace_signal], layout=layout)
         graph_json = fig.to_json()

@@ -13,6 +13,9 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    width: 90%;
+    background-color: antiquewhite;
+    margin: auto;
 }
 
 h1 {
@@ -24,9 +27,10 @@ h1 {
 
 .arc-section {
     display: flex;
+    width: 1100px;
     /* flex-direction: column; */
     align-items: center;
-    margin: 20px;
+    margin: auto;
     justify-content: space-between;
     height: 65%;
     
@@ -36,10 +40,98 @@ h1 {
     margin-bottom: 20px;
 }
 
+
+
+/* ------------------------------ From-div ----------------------------------------------------- */
+#arcDetectionForm {
+    /* margin-left: 50px; */
+    width: 100%;
+}
+.form-div {
+    font-family: Arial, sans-serif;
+    width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+label {
+    flex: 1;
+    text-align: left;
+    /* margin-right: 10px; */
+}
+
+label[for="signal_length"] {
+    margin-right: 11.25px;
+}
+
+label[for="save_arc_data"] {
+    margin-right: 10px;
+}
+
+label[for="save_dir"] {
+    margin-right: 59.86px;
+}
+
+#save_arc_data {
+    width: 192.5px;
+}
+
+#signal_length {
+    width: 192.5px;
+}
+
+#save_dir {
+    width: 178.5px;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+    flex: 1.5;
+    padding: 5px;
+    font-size: 14px;
+}
+
+button {
+    width: 60px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#startBtn {
+    background-color: rgb(71, 255, 71);
+}
+
+#updateBtn {
+    width: 75px;
+    background-color: rgb(92, 92, 255);
+}
+
+#stopBtn {
+    width: 70px;
+    background-color: rgb(255, 85, 85);
+}
+
+button:hover {
+    background-color: #e0e0e0;
+}
+/* _______________________________________________________________________ */
+
 .upper-plot-area {
-    width: 90%;
+    width: 80%;
     height: 450px;
     margin: 20px 0;
+    /* padding-right: 40px; */
     /* background-color: #e0e0e0; */
     display: flex;
     justify-content: center;
@@ -48,12 +140,8 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-#arcDetectionForm {
-    margin-left: 50px;
-}
-
 .lower-plot-area {
-    width: 80%;
+    width: 1100px;
     height: 280px;
     margin: 20px 0;
     background-color: #e0e0e0;
