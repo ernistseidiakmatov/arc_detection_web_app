@@ -1,0 +1,106 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+h1 {
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+.data-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    height: 65%; /* Take up 50% of the height */
+}
+
+.data-parameters {
+    text-align: left;
+    width: 45%;
+}
+
+.plot-area {
+    width: 50%;
+    height: 80%;
+}
+
+.logs {
+    height: 35%; /* Take up the remaining 50% of the height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent scrolling on the overall container */
+}
+
+.logs table {
+    height: 100%;
+    width: 100%;
+    border-collapse: collapse;
+    overflow-y: hidden; /* Ensures scrolling within table container */
+    display: block;
+    overflow-x: hidden;
+    table-layout: fixed;
+}
+
+.col-file-num {
+    width: 10px;
+}
+.col-file-name {
+    width: 80px;
+}
+.col-signal-type {
+    width: 30px;
+}
+.col-save-dir {
+    width: 150px;
+}
+.col-dir-size {
+    width: 10px;
+}
+.col-avlb-storage {
+    width: 10px;
+}
+
+.logs thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.logs tbody {
+    display: block;
+    height: 270px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    table-layout: fixed;
+
+}
+
+.logs th, .logs td {
+    padding: 8px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.logs th {
+    background-color: #f0f0f0; /* Optional: header background color */
+}
+
+.logs tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}

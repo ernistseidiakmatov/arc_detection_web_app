@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arc Detection</title>
+    <link rel="stylesheet" href="/static/css/arc-detection.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Arc Detector</h1>
+        <div class="arc-section">
+            <form id="arcDetectionForm">
+                <label for="signal_length"><strong>Signal Length:</strong></label>
+                <input type="number" name="signal_length" value="2048" id="signal_length" required><br><br>
+
+                <label for="save_arc_data"><strong>Save Arc Data:</strong></label>
+                <select name="save_arc_data" name="save_arc_data" id="save_arc_data" required>
+                    <option value="True">True</option>
+                    <option value="False">False</option>
+                </select><br><br>
+
+                <label for="save_dir"><strong>Save Dir </strong></label>
+                <input type="text" name="save_dir" id="save_dir" value="/dataset/" required><br><br>
+                <button type="button" onclick="startDetection()" id="startStopBtn"><strong>Start</strong></button>
+            </form>
+            <!-- <div class="arc-parameters">
+                <p><strong>Signal Length:</strong> 2048</p>
+                <p><strong>Save Arc data:</strong> False</p>
+                <p><strong>Save dir:</strong> /datasets/</p>
+                <button onclick="startArcDetection()">Start</button>
+            </div> -->
+            <div class="upper-plot-area" id="plotly-chart">
+                <!-- Placeholder for upper Voltage vs Time graph -->
+                <!-- <p>Upper Voltage vs Time graph placeholder</p> -->
+            </div>
+        </div>
+        <div class="det-hist">
+            <div class="lower-plot-area">
+            <!-- Placeholder for lower Voltage vs Time graph -->
+                <p>Lower Voltage vs Time graph placeholder</p>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/arc_detection.js">
+        
+    </script>
+</body>
+</html>
