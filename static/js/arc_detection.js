@@ -2,11 +2,69 @@ let startStopBtn = "Start";
 let websocket = null;
 let pendingDataQueue = []; // Queue to store data if WebSocket is not open yet
 
+// function initializeWebSocket() {
+//     if (websocket === null || websocket.readyState === WebSocket.CLOSED) {
+//         websocket = new WebSocket("ws://localhost:8000/arc-det");
+
+//         websocket.onopen = () => {
+//             // Send all pending data from the queue
+//             while (pendingDataQueue.length > 0) {
+//                 const data = pendingDataQueue.shift();
+//                 websocket.send(JSON.stringify(data));
+//             }
+//         };
+
+//         websocket.onmessage = (event) => {
+//             const message = JSON.parse(event.data);
+//             if (message.type === "graph") {
+//                 const graphData = JSON.parse(message.data);
+//                 // graphData.layout.width = 1000; 
+//                 Plotly.react('plotly-chart', graphData.data, graphData.layout);
+//             } else if (message.type === "finished") {
+//                 // console.log(message.message);
+//             }
+//         };
+
+//         websocket.onclose = () => {
+//             websocket = null; // Reset to allow reconnection if needed
+//         };
+
+//         websocket.onerror = (error) => {
+//             console.error("WebSocket error:", error);
+//         };
+//     }
+// }
+
+// function startDetection() {
+//     initializeWebSocket();
+
+//     const formData = new FormData(document.getElementById("arcDetectionForm"));
+//     const data = {
+//         signal_length: formData.get('signal_length'),
+//         save_arc_data: formData.get('save_arc_data'),
+//         save_dir: formData.get('save_dir')
+//     };
+
+//     if (websocket.readyState === WebSocket.OPEN) {
+//         websocket.send(JSON.stringify(data));
+//     } else if (websocket.readyState === WebSocket.CONNECTING) {
+//         // Queue the data to be sent once the WebSocket is open
+//         pendingDataQueue.push(data);
+//     } else {
+//         pendingDataQueue.push(data);
+//         initializeWebSocket();
+//     }
+// }
+
+// let websocket = null; // Declare WebSocket as a global variable
+// let pendingDataQueue = []; // Queue for messages to be sent when WebSocket is not ready
+
 function initializeWebSocket() {
     if (websocket === null || websocket.readyState === WebSocket.CLOSED) {
         websocket = new WebSocket("ws://localhost:8000/arc-det");
 
         websocket.onopen = () => {
+            console.log("WebSocket connection established.");
             // Send all pending data from the queue
             while (pendingDataQueue.length > 0) {
                 const data = pendingDataQueue.shift();
@@ -18,15 +76,15 @@ function initializeWebSocket() {
             const message = JSON.parse(event.data);
             if (message.type === "graph") {
                 const graphData = JSON.parse(message.data);
-                // graphData.layout.width = 1000; 
                 Plotly.react('plotly-chart', graphData.data, graphData.layout);
             } else if (message.type === "finished") {
-                // console.log(message.message);
+                console.log(message.message);
             }
         };
 
         websocket.onclose = () => {
-            websocket = null; // Reset to allow reconnection if needed
+            console.warn("WebSocket connection closed.");
+            websocket = null; // Reset WebSocket for reconnection
         };
 
         websocket.onerror = (error) => {
@@ -34,24 +92,61 @@ function initializeWebSocket() {
         };
     }
 }
-
 function startDetection() {
     initializeWebSocket();
 
-    const formData = new FormData(document.getElementById("arcDetectionForm"));
+    const signal_length = document.getElementById("signal_length").value || 2048;
+
     const data = {
-        signal_length: formData.get('signal_length'),
-        save_arc_data: formData.get('save_arc_data'),
-        save_dir: formData.get('save_dir')
+        start: true,
+        signal_length: parseInt(signal_length),
     };
 
     if (websocket.readyState === WebSocket.OPEN) {
         websocket.send(JSON.stringify(data));
+        console.log("Detection started with signal length:", signal_length);
     } else if (websocket.readyState === WebSocket.CONNECTING) {
         // Queue the data to be sent once the WebSocket is open
         pendingDataQueue.push(data);
     } else {
+        console.error("WebSocket is not ready. Unable to start detection.");
+    }
+}
+
+function stopDetection() {
+    initializeWebSocket();
+
+    const data = {
+        stop: true,
+    };
+
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send(JSON.stringify(data));
+        console.log("Detection stopped.");
+    } else if (websocket && websocket.readyState === WebSocket.CONNECTING) {
+        // Queue the data to be sent once the WebSocket is open
         pendingDataQueue.push(data);
-        initializeWebSocket();
+    } else {
+        console.error("WebSocket is not ready. Unable to stop detection.");
+    }
+}
+
+function updateSignalLength() {
+    initializeWebSocket();
+
+    const signal_length = document.getElementById("signal_length").value;
+
+    const data = {
+        signal_length: parseInt(signal_length),
+    };
+
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send(JSON.stringify(data));
+        console.log("Signal length updated to:", signal_length);
+    } else if (websocket && websocket.readyState === WebSocket.CONNECTING) {
+        // Queue the data to be sent once the WebSocket is open
+        pendingDataQueue.push(data);
+    } else {
+        console.error("WebSocket is not ready. Unable to update signal length.");
     }
 }

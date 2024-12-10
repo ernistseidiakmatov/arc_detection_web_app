@@ -1,5 +1,5 @@
 # main.py
-from fastapi import FastAPI, Request, Form, WebSocket
+from fastapi import FastAPI, Request, Form, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -11,6 +11,8 @@ from utils.data_saver import *
 from utils.storage import *
 from utils.predictor import *
 import asyncio
+import ctypes
+from utils.shared_state import SharedState
 
 
 
@@ -115,45 +117,115 @@ async def websocket_endpoint(websocket: WebSocket):
 async def arc_detection(request: Request):
     return templates.TemplateResponse("arc_detection.html", {"request": request})
 
+
+
+# Load the shared library
+lib = ctypes.CDLL('./libads8688.so')
+lib.ads8688_collect_samples.argtypes = [ctypes.c_uint8, ctypes.POINTER(ctypes.c_float), ctypes.POINTER(ctypes.c_size_t)]
+state = SharedState()
 @app.websocket_route("/arc-det")
+# async def websocket_endpoint(websocket: WebSocket):
+#     await websocket.accept()
+
+#     form_data = await websocket.receive_json()
+#     signal_length = int(form_data["signal_length"])
+#     save_arc_data = bool(form_data["save_arc_data"])
+#     save_dir = form_data["save_dir"]
+#     await websocket.send_json({"type": "finished", "message": "Data collection Finished!"})
+
+#     signals = get_dataset()
+#     np.random.shuffle(signals)
+#     features = np.array([get_single_signal_feature(signal) for signal in signals])
+    
+#     predictor = SignalPredictor("lstm")
+#     predictor.load_model()
+#     t = np.arange(2048)
+#     count_ = 0
+#     scaller = get_scaler()
+    
+#     for i, sample in enumerate(features[:]):
+#         columns = ['mean', 'std', 'var', 'skewness', 'kurtosis', 'peak_to_peak', 'rms', 'dominant_freq', 'spectral_entropy']
+#         sample = pd.DataFrame(sample.reshape(1, -1), columns=columns)
+#         normalized_sample = scaller.transform(sample)
+#         normalized_sample.reshape(1, 1, normalized_sample.shape[1])
+#         predicted_class, probabilities = predictor.predict(normalized_sample)
+#         res = {"prediction": predicted_class}
+#         color = 'red' if predicted_class == 1 else 'blue'
+#         if predicted_class == 0:
+#             count_ += 1
+
+#         trace_signal = go.Scatter(x=t, y=signals[i][:], mode='lines', name='Signal', line=dict(color=color))
+#         layout = go.Layout(title=f"Real-time Signal Plot {i+1}", xaxis_title="Time", yaxis_title="Amplitude")
+#         fig = go.Figure(data=[trace_signal], layout=layout)
+#         graph_json = fig.to_json()
+        
+#         await websocket.send_json({"type": "graph", "data": graph_json})
+#         await asyncio.sleep(0.08)
+#     await websocket.close()
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-
-    form_data = await websocket.receive_json()
-    signal_length = int(form_data["signal_length"])
-    save_arc_data = bool(form_data["save_arc_data"])
-    save_dir = form_data["save_dir"]
-    await websocket.send_json({"type": "finished", "message": "Data collection Finished!"})
-
-    signals = get_dataset()
-    np.random.shuffle(signals)
-    features = np.array([get_single_signal_feature(signal) for signal in signals])
     
-    predictor = SignalPredictor("lstm")
-    predictor.load_model()
-    t = np.arange(2048)
-    count_ = 0
-    scaller = get_scaler()
-    
-    for i, sample in enumerate(features[:]):
-        columns = ['mean', 'std', 'var', 'skewness', 'kurtosis', 'peak_to_peak', 'rms', 'dominant_freq', 'spectral_entropy']
-        sample = pd.DataFrame(sample.reshape(1, -1), columns=columns)
-        normalized_sample = scaller.transform(sample)
-        normalized_sample.reshape(1, 1, normalized_sample.shape[1])
-        predicted_class, probabilities = predictor.predict(normalized_sample)
-        res = {"prediction": predicted_class}
-        color = 'red' if predicted_class == 1 else 'blue'
-        if predicted_class == 0:
-            count_ += 1
+    # Listen for commands from the client
+    try:
+        while True:
+            command = await websocket.receive_json()
 
-        trace_signal = go.Scatter(x=t, y=signals[i][:], mode='lines', name='Signal', line=dict(color=color))
-        layout = go.Layout(title=f"Real-time Signal Plot {i+1}", xaxis_title="Time", yaxis_title="Amplitude")
-        fig = go.Figure(data=[trace_signal], layout=layout)
-        graph_json = fig.to_json()
-        
-        await websocket.send_json({"type": "graph", "data": graph_json})
-        await asyncio.sleep(0.08)
-    await websocket.close()
+            if "signal_length" in command:
+                # Update signal length
+                await state.update(signal_length=int(command["signal_length"]))
+
+            if "start" in command and command["start"]:
+                # Start data collection
+                await state.update(running=True)
+                asyncio.create_task(data_collection_loop(websocket))
+
+            if "stop" in command and command["stop"]:
+                # Stop data collection
+                await state.update(running=False)
+    except WebSocketDisconnect:
+        print("WebSocket disconnected.")
+        await state.update(running=False)
+
+# Data collection loop
+async def data_collection_loop(websocket: WebSocket):
+    buffer_size = 2048
+    output_buffer = (ctypes.c_float * buffer_size)()
+    out_size = ctypes.c_size_t()
+
+    t = np.arange(buffer_size)
+
+    try:
+        while True:
+            async with state.lock:
+                if not state.running:
+                    print("Stopping data collection.")
+                    break
+                signal_length = state.signal_length
+
+            # Collect signals
+            lib.ads8688_collect_samples(1, output_buffer, ctypes.byref(out_size))
+            size = out_size.value
+            signals = [output_buffer[i] for i in range(size)]
+
+            # Adjust x-axis for the given signal length
+            t = np.arange(signal_length)
+
+            # Plot the signal
+            trace_signal = go.Scatter(x=t, y=signals[:signal_length], mode='lines', name='Signal')
+            layout = go.Layout(title="Real-time Signal Plot", xaxis_title="Time", yaxis_title="Amplitude")
+            fig = go.Figure(data=[trace_signal], layout=layout)
+            graph_json = fig.to_json()
+
+            # Send the signal to the client
+            await websocket.send_json({
+                "type": "graph",
+                "data": graph_json,
+            })
+
+            # Simulate real-time processing delay
+            await asyncio.sleep(0.08)
+    except Exception as e:
+        print(f"Error in data collection loop: {e}")
 
 async def main():
     config = config = uvicorn.Config(app, host="localhost", port=8000, log_level="info", reload=True)

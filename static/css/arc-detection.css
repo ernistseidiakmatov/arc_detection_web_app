@@ -14,7 +14,7 @@ body {
     flex-direction: column;
     flex-grow: 1;
     width: 90%;
-    background-color: antiquewhite;
+    /* background-color: antiquewhite; */
     margin: auto;
 }
 
