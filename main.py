@@ -252,8 +252,8 @@ async def data_collection_loop(websocket: WebSocket):
             if sum(signal_que) == 3:
                 db.save_arc_prediction(1)
                 if save_arc_data:
-                if not os.path.exists(save_dir):
-                    os.makedirs(save_dir)
+                   if not os.path.exists(save_dir):
+                        os.makedirs(save_dir)
                 file_path = os.path.join(save_dir, filename)
                 try:
                     with open(file_path, mode='a', newline='') as file:
