@@ -124,11 +124,11 @@ async def arc_detection(request: Request):
     return templates.TemplateResponse("arc_detection.html", {"request": request})
 
 
-
+class SignalData(ctypes.Structure):
+    _fields_ = [("data", ctypes.POINTER(ctypes.c_float)), ("size", ctypes.c_size_t)]
 # Load the shared library 
-lib = ctypes.CDLL('./utils/lib_signle.so')
-lib.get_signal.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_size_t)]
-lib.get_signal.restype = ctypes.POINTER(ctypes.c_float)
+lib = ctypes.CDLL('./utils/lib_adc_signal.so')
+lib.get_signal.restype = SignalData
 state = SharedState()
 @app.websocket_route("/arc-det")
 # async def websocket_endpoint(websocket: WebSocket):
@@ -176,7 +176,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             command = await websocket.receive_json()
-            print(command)
+            # print(command)
 
             if "signal_length" in command:
                 # Update signal length
@@ -234,13 +234,10 @@ async def data_collection_loop(websocket: WebSocket):
                 detection_period =  state.detection_period
                 save_dir = state.save_dir
             
-
-            # Collect signals
-            # lib.get_signal(1, output_buffer, ctypes.byref(out_size))
-            
-            result_ptr = lib.get_signal(in_range, ctypes.byref(size))
-            # signals = [result_ptr[i] for i in range(size_value)]
-            signals = np.ctypeslib.as_array(result_ptr, shape=(size.value,))
+            # result_ptr = lib.get_signal(in_range, ctypes.byref(size))
+            result_ptr = lib.get_signal()
+            # signals = np.ctypeslib.as_array(result_ptr, shape=(result_ptr.size,))
+            signals = [result_ptr.data[i] for i in range(result_ptr.size)]
 
             features_ = get_single_signal_feature(signals)
             sample = pd.DataFrame([features_], columns=columns)
@@ -252,29 +249,21 @@ async def data_collection_loop(websocket: WebSocket):
             if sum(signal_que) == 3:
                 db.save_arc_prediction(1)
                 if save_arc_data:
-                if not os.path.exists(save_dir):
-                    os.makedirs(save_dir)
-                file_path = os.path.join(save_dir, filename)
-                try:
-                    with open(file_path, mode='a', newline='') as file:
-                        writer = csv.writer(file)
-                        writer.writerow(signals)  # Write signals as a row
-                    print(f"Signals appended to {file_path}.")
-                except Exception as e:
-                    print(f"Error writing to CSV: {e}")
+                    if not os.path.exists(save_dir):
+                        os.makedirs(save_dir)
+                    file_path = os.path.join(save_dir, filename)
+                    try:
+                        with open(file_path, mode='a', newline='') as file:
+                            writer = csv.writer(file)
+                            writer.writerow(signals)  
+                        print(f"Signals appended to {file_path}.")
+                    except Exception as e:
+                        print(f"Error writing to CSV: {e}")
             elif sum(signal_que) != 3:
                 db.save_arc_prediction(0)
-            # Adjust x-axis for the given signal length
             t = np.arange(signal_length)
-            # if random_pred == sum:
             color = 'red' if len(signal_que) == 3 and sum(signal_que) == 3 else 'blue'    
-            print(detection_period)
-            print(state.detection_period)
 
-            print(last_long_period)
-            if long_period and long_period:
-                print(long_predictions[:2])
-                print(long_period[:2])
             if detection_period <= 10:
                 timestamps, predictions = db.get_arc_predictions(detection_period)
                 if timestamps and predictions:
@@ -288,14 +277,12 @@ async def data_collection_loop(websocket: WebSocket):
             #             lower_graph_json = generate_lower_plot(long_period, long_predictions)
             upper_graph_json = generate_signal_plot(signals, signal_length, color)
 
-            # Send the signal to the client
             await websocket.send_json({
                 "type": "graph",
                 "upper-data": upper_graph_json,
                 "lower-data": lower_graph_json
             })
             
-            # Simulate real-time processing delay
             await asyncio.sleep(0.08)
         db.close()
     except Exception as e:
