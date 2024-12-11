@@ -22,6 +22,3 @@ class SharedState:
                 self.detection_period = detection_period
             if running is not None:
                 self.running = running
-
-
-# state = SharedState()
