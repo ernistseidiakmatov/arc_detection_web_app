@@ -8,8 +8,7 @@ import numpy as np
 import uvicorn
 import asyncio
 import ctypes
-from collections import deque 
-import random
+from collections import deque
 import os 
 import csv
 from utils.predictor import *
@@ -34,7 +33,7 @@ async def arc_detection(request: Request):
 
 class SignalData(ctypes.Structure):
     _fields_ = [("data", ctypes.POINTER(ctypes.c_float)), ("size", ctypes.c_size_t)]
-# Load the shared library 
+
 lib = ctypes.CDLL('./utils/lib_adc_signal.so')
 lib.get_signal.restype = SignalData
 state = SharedState()
@@ -102,8 +101,6 @@ async def data_collection_loop(websocket: WebSocket):
             normalized_sample = scaller.transform(sample).reshape(1, 1, -1)
             pred_cls, prob = predictor.predict(normalized_sample)
             signal_que.append(pred_cls)
-            # random_pred = random.randint(0, 1)
-            # signal_que.append(random_pred)
             if sum(signal_que) == 3:
                 db.save_arc_prediction(1)
                 if save_arc_data:
