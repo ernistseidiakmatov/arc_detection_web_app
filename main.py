@@ -137,7 +137,7 @@ async def data_collection_loop(websocket: WebSocket):
         print(f"Error in data collection loop: {e}")
 
 async def main():
-    config = config = uvicorn.Config(app, host="localhost", port=8000, log_level="info", reload=True)
+    config = config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_level="info", reload=True)
     server = uvicorn.Server(config)
     await server.serve()
    

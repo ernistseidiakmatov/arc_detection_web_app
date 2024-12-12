@@ -5,7 +5,7 @@ let pendingDataQueue = [];
 
 function initializeWebSocket() {
     if (websocket === null || websocket.readyState === WebSocket.CLOSED) {
-        websocket = new WebSocket("ws://localhost:8000/arc-det");
+        websocket = new WebSocket("ws://192.168.3.67:8000/arc-det");
 
         websocket.onopen = () => {
             console.log("WebSocket connection established.");
@@ -39,20 +39,26 @@ function initializeWebSocket() {
 }
 
 let isDetectionRunning = false;
-
 function toggleDetection() {
     const button = document.getElementById("toggleBtn");
+    const updateButton = document.getElementById("updateBtn"); // Get the update button
 
     if (isDetectionRunning) {
         stopDetection();
         button.textContent = "Start"; 
         button.classList.remove("stop");
         button.classList.add("start");
+
+        // Disable the Update button
+        updateButton.disabled = true;
     } else {
         startDetection();
         button.textContent = "Stop";
         button.classList.remove("start");
         button.classList.add("stop");
+
+        // Enable the Update button
+        updateButton.disabled = false;
     }
 
     isDetectionRunning = !isDetectionRunning;
