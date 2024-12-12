@@ -2,7 +2,7 @@ import os
 import math
 import shutil
 
-def_dir = "C:/Users/netvision/Desktop/ernist/server-files/web_app_arc/datasets/dummy_data"
+# def_dir = "/home/netvision/data_collector/arc_detection_web_app/utils"
 
 def get_dir_size(dir):
     total_size = 0

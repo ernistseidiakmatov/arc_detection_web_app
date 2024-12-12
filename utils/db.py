@@ -1,7 +1,6 @@
 import sqlite3
 from datetime import datetime, timedelta
 import random
-import matplotlib.pyplot as plt
 import time
 
 class DatabaseManager:

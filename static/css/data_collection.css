@@ -13,6 +13,8 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    width: 90%;
+    margin: auto;
 }
 
 h1 {
@@ -23,9 +25,73 @@ h1 {
 
 .data-section {
     display: flex;
+    width: 1100px;
+    align-items: center;
+    margin: auto;
     justify-content: space-between;
-    padding: 20px;
-    height: 65%; /* Take up 50% of the height */
+    height: 65%;
+}
+
+.form-div {
+    font-family: Arial, sans-serif;
+    width: 500px;
+    margin: 0 auto;
+}
+#signal_length-div {
+    display: inline-flex;
+    height: 17px;
+}
+#signal_length-div p {
+    margin: 0;
+}
+#signal_length-div label {
+    margin-right: 50.48px;
+}
+
+label {
+    flex: 1;
+    text-align: left;
+}
+
+label[for="num_samples"] {
+    margin-right: 3px;
+}
+
+label[for="data_type"] {
+    margin-right: 77.98px;
+}
+
+label[for="save_dir"] {
+    margin-right: 41.2px;
+}
+
+#num_samples {
+    width: 178.5px;
+}
+
+#data_type {
+    width: 192.5px;
+}
+
+#save_dir {
+    width: 178.5px;
+}
+
+
+input[type="number"],
+input[type="text"],
+select {
+    flex: 1.5;
+    padding: 5px;
+    font-size: 14px;
+}
+
+button {
+    width: 60px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .data-parameters {
@@ -38,11 +104,18 @@ h1 {
     height: 80%;
 }
 
+.log-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .logs {
-    height: 35%; /* Take up the remaining 50% of the height */
+    height: 100%; /* Take up the remaining 50% of the height */
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Prevent scrolling on the overall container */
+    width: 1100px;
 }
 
 .logs table {

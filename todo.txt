@@ -1,6 +1,0 @@
-
-
-Prediction Report
-    Number of ARC events detected so far
-    With in what 2 hours arc occured most during a day
-    
