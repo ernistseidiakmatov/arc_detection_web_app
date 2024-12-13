@@ -5,7 +5,7 @@ let pendingDataQueue = [];
 
 function initializeWebSocket() {
     if (websocket === null || websocket.readyState === WebSocket.CLOSED) {
-        websocket = new WebSocket("ws://192.168.3.67:8000/arc-det");
+        websocket = new WebSocket("ws://localhost:8000/arc-det");
 
         websocket.onopen = () => {
             console.log("WebSocket connection established.");
