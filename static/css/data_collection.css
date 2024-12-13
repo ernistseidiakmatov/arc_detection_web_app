@@ -138,13 +138,13 @@ button {
     width: 30px;
 }
 .col-save-dir {
-    width: 150px;
+    width: 130px;
 }
 .col-dir-size {
-    width: 10px;
+    width: 20px;
 }
 .col-avlb-storage {
-    width: 10px;
+    width: 20px;
 }
 
 .logs thead {

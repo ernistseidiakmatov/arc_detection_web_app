@@ -48,7 +48,7 @@ async def start_collection(form_data: DataForm):
     print(data_type)
     print(save_dir)
 
-    file_name = collect_data(num_samples, data_type, save_dir)
+    file_name = collect_data(num_samples, data_type, save_dir).split("/")[-1]
     dir_size = get_dir_size(save_dir)
     avlb_storage = get_available_disk_space(save_dir)
 
@@ -59,7 +59,7 @@ async def start_collection(form_data: DataForm):
         "data_type": data_type,
         "save_dir": save_dir,
         "dir_size": dir_size,
-        "avln_storage": avlb_storage
+        "avlb_storage": avlb_storage
     }
 
     print(result)

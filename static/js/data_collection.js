@@ -40,10 +40,12 @@ let fileCount = 0
 function addLogEntry(fileName, signalType, saveDir, saveDirSize, avlbStorage) {
     const logTableBody = document.getElementById("logTableBody");
     const newRow = document.createElement("tr");
+    console.log("Add Log Entyry");
+    console.log(fileName, signalType, saveDir, saveDirSize, avlbStorage);
     fileCount += 1
     newRow.innerHTML = `
         <td class="col-file-num">${fileCount}</td>
-        <td class="col-file-name">${fileName ? fileName.substring(0, 7) : 'N/A'}</td>
+        <td class="col-file-name">${fileName || 'N/A'}</td>
         <td class="col-signal-type">${signalType || 'N/A'}</td>
         <td class="col-save-dir">${saveDir || 'N/A'}</td>
         <td class="col-dir-size">${saveDirSize || 'N/A'}</td>
@@ -71,17 +73,23 @@ function startCollection() {
         body: JSON.stringify(data)
     }).then(response => response.json()).then(result => {
         if (result.status === "success") {
-            if (result.log_entry) {
+            if (result) {
                 addLogEntry(
                     // result.log_entry.FileNum,
-                    result.log_entry.filename,
-                    result.log_entry.signal_type,
-                    result.log_entry.save_dir,
-                    result.log_entry.save_dir_size,
-                    result.log_entry.avlb_storage
+                    result.file_name,
+                    result.data_type,
+                    result.save_dir,
+                    result.dir_size,
+                    result.avlb_storage
                 );
             }
             console.log(result.message);
+            console.log(result);
+            console.log(result.file_name);
+            console.log(result.data_type);
+            console.log(result.save_dir);
+            console.log(result.dir_size);
+            console.log(result.avlb_storage);
         } else {
             console.error("error", result.message);
         }
