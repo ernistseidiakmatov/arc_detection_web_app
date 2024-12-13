@@ -1,4 +1,3 @@
-# main.py
 from fastapi import FastAPI, Request, Form, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,7 +18,7 @@ from pydantic import BaseModel
 from utils.collector import collect_data
 from utils.calc_stats import *
 import time
-# import csv
+from utils.transfer2usb import transfer_data
 
 
 class DataForm(BaseModel):
@@ -27,6 +26,8 @@ class DataForm(BaseModel):
     data_type: str
     save_dir: str
 
+class data_form(BaseModel):
+    save_dir: str
 
 
 
@@ -71,6 +72,18 @@ async def start_collection(form_data: DataForm):
     }
 
     return result
+
+@app.post("/transfer-dataset")
+async def transfer2usb(form_data: data_form):
+
+    msg = transfer_data(form_data.save_dir)
+    print(msg)
+    res = {
+        "status": "success" if msg == "Data transferred to USB" else "error",
+        "message": msg
+    }
+
+    return JSONResponse(content=res) 
 
 
 async def main():

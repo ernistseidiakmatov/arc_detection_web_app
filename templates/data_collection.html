@@ -31,7 +31,8 @@
                     <label for="save_dir"><strong>Save Directory:</strong></label>
                     <input type="text" id="save_dir" name="save_dir" value="/home/netvision/Desktop/datasets" required><br><br>
 
-                    <button type="button" onclick="startCollection()">Start </button>
+                    <button type="button" onclick="startCollection()" id="start">Start </button>
+                    <button type="button"id="transferBtn" onclick="transferDataset()">Transfer to USB</button>
                  </form>
              </div>
         
@@ -72,16 +73,7 @@
                             <th class="col-avlb-storage">Avlb. storage</th>
                         </tr>
                     </thead>
-                    <tbody id="logTableBody">
-                        <!-- <tr>
-                            <td class="col-file-num">1</td>
-                            <td class="col-file-name">2024-11-11...</td>
-                            <td class="col-signal-type">Normal</td>
-                            <td class="col-save-dir">/datasets/</td>
-                            <td class="col-dir-size">63 MB</td>
-                            <td class="col-avlb-storage">2.3 GB</td>
-                        </tr> -->
-                    </tbody>
+                    <tbody id="logTableBody"></tbody>
                 </table>
             </div>
         </div>

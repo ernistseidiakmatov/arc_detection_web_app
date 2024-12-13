@@ -1,5 +1,4 @@
 
-
 let fileCount = 0
 
 function addLogEntry(fileName, signalType, saveDir, saveDirSize, avlbStorage) {
@@ -34,26 +33,22 @@ function startCollection() {
     const progressText = document.getElementById("progressText");
     const statsTable = document.getElementById("statsTable");
     
-    // Show progress bar and hide stats table
     progressBarContainer.style.display = "block";
     statsTable.style.display = "none";
     progressBar.value = 0;
     progressText.textContent = "0%";
 
-    // Calculate total expected time based on numSamples
-    const totalTimeEstimate = 16.65 * numSamples; // Adjust this factor based on your needs
+    const totalTimeEstimate = 16.65 * numSamples;
     let elapsedTime = 0;
 
-    // Update progress every 50ms
     const progressInterval = setInterval(() => {
         elapsedTime += 100;
         const progress = Math.min((elapsedTime / totalTimeEstimate) * 100, 99);
         progressBar.value = progress;
         progressText.textContent = `${Math.round(progress)}%`;
         
-        // Slow down the progress bar as it approaches 99%
         if (progress >= 90) {
-            elapsedTime += 100; // Add extra time to slow down
+            elapsedTime += 100; 
         }
     }, 100);
 
@@ -103,5 +98,32 @@ function startCollection() {
             progressBarContainer.style.display = "none";
             statsTable.style.display = "table";
         }, 1000);
+    });
+}
+
+
+function transferDataset() {
+    const formData = new FormData(document.getElementById("dataCollectionForm"));
+    const numSamples = parseInt(formData.get("num_samples"));
+    const data = {
+        save_dir: formData.get("save_dir") || "/home/netvision/Desktop/datasets/"
+    };
+
+    fetch("/transfer-dataset", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    }).then(response => response.json()).then(result => {
+        if (result.status === "success") {
+            console.log(result)
+            if (result) {
+                alert(result.message);
+            }
+        } else {
+            console.log(result)
+            alert(result.message);
+        }
     });
 }

@@ -86,13 +86,48 @@ select {
     font-size: 14px;
 }
 
+
 button {
-    width: 60px;
     padding: 10px;
     font-size: 16px;
     border-radius: 4px;
     cursor: pointer;
+    margin-right: 10px;
 }
+
+
+#start {
+    background-color: rgb(15, 223, 15); 
+    font-weight: bold;
+}
+
+#stop {
+    background-color: rgb(248, 166, 59); 
+    font-weight: bold;
+}
+
+#start:hover {
+    background-color: rgb(113, 255, 113);
+}
+
+#stop:hover {
+    background-color: rgb(255, 189, 103);
+}
+
+#transferBtn {
+    background-color: rgb(161, 161, 223);
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #8eaef5;
+}
+
+#transferBtn:hover {
+    background-color: #8eaef5;
+}
+
 
 .data-parameters {
     text-align: left;
