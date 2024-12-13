@@ -11,9 +11,9 @@ def collect_data(num_samples, signal_type, save_dir):
             ]
         collector_lib = ctypes.CDLL('./utils/lib_collector.so')
         collector_lib.collect_and_save.argtypes = [
-            ctypes.c_int,        # num_samples
-            ctypes.c_char_p,     # signal_type
-            ctypes.c_char_p,     # save_dir
+            ctypes.c_int,       
+            ctypes.c_char_p,     
+            ctypes.c_char_p,
         ]
         collector_lib.collect_and_save.restype = SignalData
 
@@ -27,7 +27,6 @@ def collect_data(num_samples, signal_type, save_dir):
         )
 
         file_name = result.data.decode('utf-8')
-        print(file_name)
         collector_lib.free_signal(ctypes.byref(result))
         return file_name
     except:

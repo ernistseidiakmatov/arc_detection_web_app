@@ -2,7 +2,6 @@ import os
 import math
 import shutil
 
-# def_dir = "/home/netvision/data_collector/arc_detection_web_app/utils"
 
 def get_dir_size(dir):
     total_size = 0

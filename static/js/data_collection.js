@@ -1,40 +1,5 @@
 
 
-// function startCollection() {
-//     // alert('Data collection started!');
-//     const formData = new FormData(document.getElementById("dataCollectionForm"));
-//     const data = {
-//         signal_length: formData.get('signal_length'),
-//         num_samples: formData.get('num_samples'),
-//         data_type: formData.get('data_type'),
-//         save_dir: formData.get('save_dir')
-//     };
-
-//     console.log(data)
-//     const hi = {
-//         msg: "hello world"
-//     }
-//     const websocket = new WebSocket("ws://localhost:8000/col-sim");
-//     websocket.onopen = () => {
-//         websocket.send(JSON.stringify(data));
-//     };
-
-//     websocket.onmessage = (event) => {
-//         const message = JSON.parse(event.data);
-//         if (message.type === "graph") {
-//             const graphData = JSON.parse(message.data);
-//             // console.log("recieved graph", graphData);
-//             Plotly.newPlot('plotly-chart', graphData.data, graphData.layout);
-//         } else if (message.type === "log") {
-//             addLogEntry(message.fileNum, message.fileName, message.signalType, message.saveDir, message.saveDirSize, message.avlbStorage);
-//             // console.log("recieved log", message.fileName);
-//         } else if (message.type === "finished") {
-//             console.log(message.message);
-//             // alert(message.message);
-//         }
-//     };
-// };
-
 let fileCount = 0
 
 function addLogEntry(fileName, signalType, saveDir, saveDirSize, avlbStorage) {
@@ -55,45 +20,88 @@ function addLogEntry(fileName, signalType, saveDir, saveDirSize, avlbStorage) {
     logTableBody.scrollTop = logTableBody.scrollHeight;
 }
 
-
-
 function startCollection() {
     const formData = new FormData(document.getElementById("dataCollectionForm"));
+    const numSamples = parseInt(formData.get("num_samples"));
     const data = {
-        num_samples: parseInt(formData.get("num_samples")),
+        num_samples: numSamples,
         data_type: formData.get("data_type"),
         save_dir: formData.get("save_dir") || "/home/netvision/Desktop/datasets/"
     };
 
+    const progressBarContainer = document.getElementById("progressBarContainer");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const statsTable = document.getElementById("statsTable");
+    
+    // Show progress bar and hide stats table
+    progressBarContainer.style.display = "block";
+    statsTable.style.display = "none";
+    progressBar.value = 0;
+    progressText.textContent = "0%";
+
+    // Calculate total expected time based on numSamples
+    const totalTimeEstimate = 16.65 * numSamples; // Adjust this factor based on your needs
+    let elapsedTime = 0;
+
+    // Update progress every 50ms
+    const progressInterval = setInterval(() => {
+        elapsedTime += 100;
+        const progress = Math.min((elapsedTime / totalTimeEstimate) * 100, 99);
+        progressBar.value = progress;
+        progressText.textContent = `${Math.round(progress)}%`;
+        
+        // Slow down the progress bar as it approaches 99%
+        if (progress >= 90) {
+            elapsedTime += 100; // Add extra time to slow down
+        }
+    }, 100);
+
     fetch("/start-collection", {
-        method: "POST", 
+        method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data)
     }).then(response => response.json()).then(result => {
+        clearInterval(progressInterval);
+        progressBar.value = 100;
+        progressText.textContent = "100%";
+
         if (result.status === "success") {
             if (result) {
                 addLogEntry(
-                    // result.log_entry.FileNum,
                     result.file_name,
                     result.data_type,
                     result.save_dir,
                     result.dir_size,
                     result.avlb_storage
                 );
+
+                const tableBody = document.querySelector("#statsTable tbody");
+                tableBody.innerHTML = "";
+
+                for (const [key, value] of Object.entries(result.stats)) {
+                    const row = tableBody.insertRow();
+                    const cellKey = row.insertCell(0);
+                    const cellValue = row.insertCell(1);
+                    cellKey.textContent = key;
+                    cellKey.classList.add("stat-cell");
+                    cellValue.textContent = value;
+                }
             }
             console.log(result.message);
             console.log(result);
-            console.log(result.file_name);
-            console.log(result.data_type);
-            console.log(result.save_dir);
-            console.log(result.dir_size);
-            console.log(result.avlb_storage);
         } else {
             console.error("error", result.message);
         }
     }).catch(error => {
+        clearInterval(progressInterval);
         console.error("Error", error);
+    }).finally(() => {
+        setTimeout(() => {
+            progressBarContainer.style.display = "none";
+            statsTable.style.display = "table";
+        }, 1000);
     });
 }

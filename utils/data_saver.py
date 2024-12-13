@@ -11,7 +11,6 @@ class DataSaver:
         self.buffer = []
         self.data_dir = data_dir
         self.signal_type = signal_type
-        print(data_dir)
 
     def get_filename(self):
         datetime_obj = datetime.now()
@@ -33,6 +32,4 @@ class DataSaver:
             pd.DataFrame(self.buffer).to_csv(save_dir, index=False, header=False, sep=' ')
             self.buffer = []
             self.row_count = 0
-
-            print(save_dir)
         return filename, self.def_dir
